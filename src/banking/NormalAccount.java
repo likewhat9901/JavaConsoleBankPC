@@ -4,9 +4,13 @@ public class NormalAccount extends Account{
 
 	private int interest;
 	
-	public NormalAccount(String accNum, String owner, int balance, int interest) {
-		super(accNum, owner, balance);
+	public NormalAccount(int accType, String accNum, String owner, int balance, int interest) {
+		super(accType, accNum, owner, balance);
 		this.interest = interest;
+	}
+
+	public int getInterest() {
+		return interest;
 	}
 
 	@Override
