@@ -1,8 +1,10 @@
 package banking;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract class Account {
+public abstract class Account implements Serializable{
+	private static final long serialVersionUID = 1L;
 	
 	protected String accNum;
 	protected String owner;
@@ -16,6 +18,11 @@ public abstract class Account {
 		this.balance = balance;
 	}
 	
+	@Override
+	public String toString() {
+		return "Account [계좌번호=" + accNum + "]";
+	}
+
 	public void showAccInfo() {
 		System.out.println("-------------");
 		System.out.println("계좌종류(1:보통계좌 / 2:신용신뢰계좌): "+ accType);
@@ -49,9 +56,15 @@ public abstract class Account {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
-		if (getClass() != obj.getClass())
+		if (getClass() != obj.getClass()) {
+			System.out.println("클래스 다름");
 			return false;
+		}
 		Account other = (Account) obj;
-		return Objects.equals(accNum, other.accNum);
+		
+		boolean isEqual = Objects.equals(accNum, other.accNum);
+//		if (isEqual) System.out.println("accNum 중복됨:" + accNum);
+		
+		return isEqual;
 	}
 }

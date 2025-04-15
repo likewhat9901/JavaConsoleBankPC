@@ -8,6 +8,9 @@ public interface ICustomDefine {
 	int WITHDRAW = 3;
 	int INQUIRE = 4;
 	int DELETE = 5;
-	int EXIT = 6;
+	int SAVE = 6;
+	int LOAD = 7;
+	int AUTOSAVE = 8;
+	int EXIT = 0;
 	
 }
