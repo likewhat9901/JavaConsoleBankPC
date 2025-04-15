@@ -20,15 +20,27 @@ public abstract class Account implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "Account [계좌번호=" + accNum + "]";
+		return " [계좌번호=" + accNum + ", 이름=" + owner 
+				+ ", 잔고=" + balance + "원";
 	}
 
 	public void showAccInfo() {
 		System.out.println("-------------");
-		System.out.println("계좌종류(1:보통계좌 / 2:신용신뢰계좌): "+ accType);
+		System.out.println("계좌종류: "+ accTypeName());
 		System.out.println("계좌번호: "+ accNum);
 		System.out.println("고객이름: "+ owner);
 		System.out.println("잔고: "+ balance + "원");
+	}
+	
+	public String accTypeName() {
+		switch (accType) {
+		case 1:
+			return "보통계좌";
+		case 2: 
+			return "신용신뢰계좌";
+		default:
+			return null;
+		}
 	}
 
 	public int getAccType() {

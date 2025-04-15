@@ -1,7 +1,8 @@
 package banking;
 
 public class HighCreditAccount extends Account{
-
+	private static final long serialVersionUID = 1L;
+	
 	private int interest;
 	private String creditGrade;
 	
@@ -12,16 +13,39 @@ public class HighCreditAccount extends Account{
 		this.creditGrade = creditGrade;
 	}
 
+	@Override
+	public String toString() {
+		return "[신용신뢰계좌] " + super.toString() + ", 기본이자=" + interest 
+				+ "%" + ", 추가이자=" + getCreditIntereset() + "%" + "]";
+	}
+
 	public int getInterest() {
+		return interest;
+	}
+
+	public int getCreditIntereset() {
 		switch (creditGrade) {
 		case "A":
-			return interest + 7;
+			return 7;
 		case "B":
-			return interest + 4;
+			return 4;
 		case "C":
-			return interest + 2;
+			return 2;
 		default:
-			return interest;
+			return 0;
+		}
+	}
+
+	public String getCreditGrade() {
+		switch (creditGrade) {
+		case "A":
+			return creditGrade + "등급" + "(추가이자: 7%)";
+		case "B":
+			return creditGrade + "등급" + "(추가이자: 4%)";
+		case "C":
+			return creditGrade + "등급" + "(추가이자: 2%)";
+		default:
+			return "A,B,C등급이 아님";
 		}
 	}
 
@@ -29,7 +53,7 @@ public class HighCreditAccount extends Account{
 	public void showAccInfo() {
 		super.showAccInfo();
 		System.out.println("기본이자: "+ interest + "%");
-		System.out.println("신용등급(A,B,C등급): "+ creditGrade + "등급");
+		System.out.println("신용등급: "+ getCreditGrade());
 		System.out.println("-------------");
 	}
 

@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.HashSet;
 
 import banking.Account;
-import banking.AutoSaver;
 import banking.HighCreditAccount;
 import banking.NormalAccount;
 
@@ -42,13 +41,14 @@ public class AccountUtil {
         String name = inputLine(scan, "고객이름: ");
         int balance = Integer.parseInt(inputLine(scan, "잔고: "));
         int intRate = Integer.parseInt(inputLine(scan, "기본이자%(정수형태로입력): "));
+        int depositCount = 0;
         
         //계좌정보 저장할 Account 객체 생성 
         Account NewAcc = null;
         
         //계좌타입에 따라 계좌생성
         if (accType == 1) {
-        	NewAcc = new NormalAccount(accType, accNum, name, balance, intRate);
+        	NewAcc = new NormalAccount(accType, accNum, name, balance, intRate, depositCount);
         } else if (accType == 2) {
     		while (true) {
     			String CreditGrade = inputLine(scan, "신용등급(A,B,C등급): ").toUpperCase();
@@ -118,7 +118,8 @@ public class AccountUtil {
 			return interest;
 		case 2: 
 			HighCreditAccount highAcc = (HighCreditAccount) acc;
-			interest = (int) (acc.getBalance() * highAcc.getInterest() / 100);
+			interest = (int) (acc.getBalance() 
+					* (highAcc.getInterest() + highAcc.getCreditIntereset()) / 100);
 			return interest;
 		default:
 			System.out.println("계좌타입을 알수 없습니다.");
@@ -175,55 +176,54 @@ public class AccountUtil {
 	
 	//6.계좌정보 파일저장
 	public static void saveAccAsFile(Set<Account> accounts) {
-		String basename = "src/banking/file/AccountInfo";
-		String filename = basename + ".obj";
-		int counter = 1;
-
-//		File file = new File(filename);
-		while(new File(filename).exists()) {
-			filename = basename + counter + ".obj";
-			counter++;
-		}
+		String fileroot = "src/banking/file/AccountInfo.obj";
+		File file = new File(fileroot);
+		
+		if (file.exists()) {
+			file.delete();
+		} 
 		
 		try (ObjectOutputStream out = new ObjectOutputStream(
-				new FileOutputStream(filename)))
+				new FileOutputStream(fileroot)))
 		{	
 			System.out.println(accounts.size() + "개의 계좌를 저장합니다...");
-            out.writeObject(accounts);
-            System.out.println("계좌정보 저장 완료!");
+			out.writeObject(accounts);
+			System.out.println("AccountInfo.obj 파일로 저장되었습니다.");
+			
 		} catch (IOException e) {
-            System.out.println("계좌정보 저장 실패..");
+            System.out.println("파일저장 실패..");
 			e.printStackTrace();
 		}
 	}
 	
 	//7.계좌정보 불러오기
-	public static Set<Account> loadAccFile(Scanner scan) {
-		String basename = "src/banking/file/";
-		String selectFilename = inputLine(scan, 
-				"불러올 obj 파일 이름을 입력하세요.(ex.AccountInfo1): ");
-		String filename = basename + selectFilename + ".obj";
+	public static void loadAccFile(Scanner scan, Set<Account>accounts) {
+		String filename = "src/banking/file/AccountInfo.obj";
 		
 		if (!new File(filename).exists()) {
 			System.out.println("불러올 파일이 존재하지 않습니다.");
-			return null;
+			return;
 		}
 		
-		try (ObjectInputStream in = new ObjectInputStream(
-				new FileInputStream(filename)))
-		{	Set<Account> loaded = (HashSet<Account>) in.readObject();
+		try (ObjectInputStream in = new ObjectInputStream
+				(new FileInputStream(filename)))
+		{	
+			@SuppressWarnings("unchecked")
+			Set<Account> loaded = (HashSet<Account>) in.readObject();
+			accounts.clear(); //기존내용 지우기
+			accounts.addAll(loaded); //loaded 데이터 추가
+			
+			System.out.println("AccountInfo.obj 복원완료");
 			System.out.println(loaded.size() + "개의 계좌를 불러왔습니다.");
-            System.out.println("계좌정보 불러오기 완료!");
-            return loaded;
+            return;
 		} catch (IOException | ClassNotFoundException e) {
             System.out.println("계좌정보 불러오기 실패..");
 			e.printStackTrace();
-			return null;
+			return;
 		}
 	}
 	
 	public static void autoSave(Set<Account> accounts) {
-		AutoSaver trd1 = new AutoSaver(accounts);
 		
 		
 	}

@@ -8,7 +8,12 @@ public class BankingSystemMain extends AccountManager{
 	public static void main(String[] args) {
 
 		AccountManager accMng = new AccountManager();
-		accMng.showMenu();
+		
+		accMng.loadAccount();
+		while (true) {
+			
+			accMng.showMenu();
+		}
 		
 	}
 
