@@ -6,10 +6,16 @@ import java.util.Scanner;
 public class BankingSystem_JDBC {
 	static Scanner scan = new Scanner(System.in);
 	
+	static Connection conn; //DB연결
+	static ResultSet rs; //select의 실행결과 반환
+	static PreparedStatement psmt; //동적 쿼리문 실행
+	
+	public void deposit() {
+		
+		
+	}
+	
 	public static void main(String[] args) {
-		Connection conn; //DB연결
-		ResultSet rs; //select의 실행결과 반환
-		PreparedStatement psmt; //동적 쿼리문 실행
 		int result;
 		
 		try {
@@ -22,13 +28,13 @@ public class BankingSystem_JDBC {
 			//연결에 성공하면 Connection 인스턴스를 반환한다.
 			conn = DriverManager.getConnection(url, id, pass);
 			
-			System.out.println("계좌번호: ");
+			System.out.print("계좌번호: ");
 			int acc_num = Integer.parseInt(scan.nextLine());
-			System.out.println("이름: ");
+			System.out.print("이름: ");
 			String name = scan.nextLine();
-			System.out.println("잔액: ");
+			System.out.print("잔액: ");
 			int balance = Integer.parseInt(scan.nextLine());
-			System.out.println("이자율: ");
+			System.out.print("이자율: ");
 			int interest_rate = Integer.parseInt(scan.nextLine());
 			
 			String sql = "insert into banking" + " values "
@@ -47,6 +53,8 @@ public class BankingSystem_JDBC {
 			
 		} catch (SQLException e) {
 			System.out.println("SQL 오류 발생");
-		} 
+		} catch (ClassNotFoundException e) {
+			System.out.println("Class 오류 발생");
+		}
 	}
 }

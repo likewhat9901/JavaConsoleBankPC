@@ -23,7 +23,7 @@ public abstract class Account implements Serializable{
 		return " [계좌번호=" + accNum + ", 이름=" + owner 
 				+ ", 잔고=" + balance + "원";
 	}
-
+	
 	public void showAccInfo() {
 		System.out.println("-------------");
 		System.out.println("계좌종류: "+ accTypeName());
