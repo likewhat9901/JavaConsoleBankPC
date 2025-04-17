@@ -11,7 +11,6 @@ public abstract class Account implements Serializable{
 	protected int accType ,balance;
 	
 	public Account(int accType, String accNum, String owner, int balance) {
-		super();
 		this.accType = accType;
 		this.accNum = accNum;
 		this.owner = owner;
@@ -38,6 +37,8 @@ public abstract class Account implements Serializable{
 			return "보통계좌";
 		case 2: 
 			return "신용신뢰계좌";
+		case 3:
+			return "특판계좌";
 		default:
 			return null;
 		}
@@ -68,7 +69,7 @@ public abstract class Account implements Serializable{
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof Account)) {
 			System.out.println("클래스 다름");
 			return false;
 		}

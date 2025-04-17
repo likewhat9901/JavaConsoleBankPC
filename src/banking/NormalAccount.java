@@ -3,13 +3,12 @@ package banking;
 public class NormalAccount extends Account{
 	private static final long serialVersionUID = 1L;
 	
-	private int interest, normDepositCnt;
+	private int interest;
 	
 	public NormalAccount(int accType, String accNum, String owner, int balance, 
-			int interest, int normDepositCnt) {
+			int interest) {
 		super(accType, accNum, owner, balance);
 		this.interest = interest;
-		this.normDepositCnt = normDepositCnt;
 	}
 
 	@Override
@@ -21,22 +20,18 @@ public class NormalAccount extends Account{
 		return interest;
 	}
 	
-	public int getDepositCount() {
-		return normDepositCnt;
-	}
 
-	public void setDepositCount(int normDepositCnt) {
-		this.normDepositCnt = normDepositCnt;
-	}
 
 	@Override
 	public void showAccInfo() {
 		super.showAccInfo();
 		System.out.println("기본이자: "+ interest + "%");
-		System.out.println("누적 입금횟수(짝수번째 축하금 지급): "+ normDepositCnt + "번 입금완료");
 		System.out.println("-------------");
 	}
 	
+	public void CallSuperShow() {
+		super.showAccInfo();
+	}
 	
 
 }

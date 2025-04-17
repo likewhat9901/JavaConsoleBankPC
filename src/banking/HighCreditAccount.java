@@ -39,11 +39,11 @@ public class HighCreditAccount extends Account{
 	public String getCreditGrade() {
 		switch (creditGrade) {
 		case "A":
-			return creditGrade + "등급" + "(추가이자: 7%)";
+			return creditGrade + "등급 (추가이자: 7%)";
 		case "B":
-			return creditGrade + "등급" + "(추가이자: 4%)";
+			return creditGrade + "등급 (추가이자: 4%)";
 		case "C":
-			return creditGrade + "등급" + "(추가이자: 2%)";
+			return creditGrade + "등급 (추가이자: 2%)";
 		default:
 			return "A,B,C등급이 아님";
 		}

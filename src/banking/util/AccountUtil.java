@@ -14,6 +14,7 @@ import java.util.HashSet;
 import banking.Account;
 import banking.HighCreditAccount;
 import banking.NormalAccount;
+import banking.SpecialAccount;
 
 
 public class AccountUtil {
@@ -29,75 +30,20 @@ public class AccountUtil {
     }
     
 	public static Account findAccount(Set<Account> accounts, String accNum) {
-		Account dummy = new NormalAccount(1, accNum, "", 0, 0, 0);
 		
-		if (accounts.contains(dummy)) {
-			for (Account acc : accounts) {
-				if (acc.equals(dummy)) {
-					return acc;
-				}
+		for (Account acc : accounts) {
+			if (acc.getAccNum().equals(accNum)) {
+				return acc;
 			}
 		}
+		
 		return null;
 	}
 	
     //1.계좌개설
     public static void createAccount(Scanner scan, int accType, Set<Account> accounts) {
         String accNum = inputLine(scan, "계좌번호: ");
-        String name = inputLine(scan, "고객이름: ");
-        int balance = Integer.parseInt(inputLine(scan, "잔고: "));
-        int intRate = Integer.parseInt(inputLine(scan, "기본이자%(정수형태로입력): "));
-        //보통계좌 count = 0 으로 설정
-        int normDepositCnt = 0;
-        
-        //계좌정보 저장할 Account 객체 생성 
-        Account NewAcc = null;
-        
-        //계좌타입에 따라 계좌생성
-        if (accType == 1) {
-        	NewAcc = new NormalAccount
-        			(accType, accNum, name, balance, intRate, normDepositCnt);
-        } else if (accType == 2) {
-    		while (true) {
-    			String CreditGrade = inputLine(scan, "신용등급(A,B,C등급): ").toUpperCase();
-    			switch (CreditGrade) {
-    			case "A", "B", "C" : 
-    				NewAcc = new HighCreditAccount
-    				(accType, accNum, name, balance, intRate, CreditGrade);
-    				break;
-    			default:
-    				System.out.println("잘못된 입력입니다. A,B,C 중 하나를 입력하세요");
-    				continue;
-    			}
-    			break;
-    		}
-        } else {
-        	System.out.println("뭔가 잘못됐습니다.");
-        	return;
-        }
-        
-        //중복확인
-        if (accounts.contains(NewAcc)) {
-        	String answer = inputLine(scan, "중복계좌 발견됨. 덮어쓸까요?(y or n): ");
-        	
-        	if (answer.equalsIgnoreCase("y")) {
-        		System.out.println("기존 계좌 삭제됨 : " + accounts.remove(NewAcc));
-        		System.out.println("새로운 계좌 생성됨 : " + accounts.add(NewAcc));
-        		System.out.println("덮어쓰기 완료!");
-        	} else if (answer.equalsIgnoreCase("n")){
-        		System.out.println("계좌개설 취소");
-        	} else {
-        		System.out.println("y or n 을 입력하세요.");
-        	}
-        } else {
-        	accounts.add(NewAcc);
-        	System.out.println("계좌 추가완료!");
-        }
-    }
-    
-    public static void createAccount2(Scanner scan, int accType, Set<Account> accounts) {
-        String accNum = inputLine(scan, "계좌번호: ");
-        Account dummy = new NormalAccount(accType, accNum, " ", 0, 0, 0);
+        Account dummy = new NormalAccount(accType, accNum, " ", 0, 0);
         
         //중복확인
         while (true) {
@@ -107,15 +53,19 @@ public class AccountUtil {
         		if (answer.equalsIgnoreCase("y")) {
         			accounts.remove(dummy);
         			System.out.println("추가정보를 입력해주세요.");
+        			//break로 while문 종료 후, 추가정보 입력
         			break;
         		} else if (answer.equalsIgnoreCase("n")){
         			System.out.println("계좌생성 취소");
+        			//return으로 메뉴로 복귀
         			return;
         		} else {
         			System.out.println("y or n 을 입력하세요.");
+        			//continue로 while문 다시 실행
         			continue;
         		}
         	} else {
+        		//중복 계좌없을 시, 추가정보 입력
         		break;
         	}
 		}
@@ -125,32 +75,51 @@ public class AccountUtil {
         int balance = Integer.parseInt(inputLine(scan, "잔고: "));
         int intRate = Integer.parseInt(inputLine(scan, "기본이자%(정수형태로입력): "));
         
+        Account newAcc = null;
+        
         //계좌타입에 따라 계좌생성
-        if (accType == 1) {
-        	//보통계좌 count = 0 으로 설정
-        	int normDepositCnt = 0;
-        	Account NewAcc = new NormalAccount
-        			(accType, accNum, name, balance, intRate, normDepositCnt);
-        	accounts.add(NewAcc);
-        } else if (accType == 2) {
+        switch (accType) {
+		case 1:
+			while (true) {
+				String answer = inputLine(scan, "특판계좌 상품에 가입하시겠습니까?(y or n): ").toUpperCase();
+				switch (answer) {
+				case "Y" :
+					int DepositCnt = 0;
+					accType = 3;
+					newAcc = new SpecialAccount
+							(accType, accNum, name, balance, intRate, DepositCnt);
+					accounts.add(newAcc);
+					System.out.println("특판계좌 개설 성공!");
+					return;
+				case "N" :
+					newAcc = new NormalAccount
+					(accType, accNum, name, balance, intRate);
+					accounts.add(newAcc);
+					System.out.println("보통계좌 개설 성공!");
+					return;
+				default:
+					System.out.println("(y or n)를 입력하세요");
+					continue;
+				}
+			}
+		case 2:
     		while (true) {
     			String CreditGrade = inputLine(scan, "신용등급(A,B,C등급): ").toUpperCase();
     			switch (CreditGrade) {
     			case "A", "B", "C" : 
-    				Account NewAcc = new HighCreditAccount
+    				newAcc = new HighCreditAccount
     				(accType, accNum, name, balance, intRate, CreditGrade);
-            		accounts.add(NewAcc);
-    				break;
+            		accounts.add(newAcc);
+            		return;
     			default:
     				System.out.println("잘못된 입력입니다. A,B,C 중 하나를 입력하세요");
     				continue;
     			}
-    			break;
     		}
-        } else {
+		default:
         	System.out.println("뭔가 잘못됐습니다.");
         	return;
-        }
+		}
     }
 	
 	//2.입 금
@@ -187,6 +156,10 @@ public class AccountUtil {
 			interest = (int) (acc.getBalance() 
 					* (highAcc.getInterest() + highAcc.getCreditIntereset()) / 100);
 			return interest;
+		case 3: 
+			SpecialAccount specAcc = (SpecialAccount) acc;
+			interest = (int) (acc.getBalance() * specAcc.getInterest() / 100);
+			return interest;
 		default:
 			System.out.println("계좌타입을 알수 없습니다.");
 			return 0;
@@ -194,18 +167,15 @@ public class AccountUtil {
 	}
 	
 	public static int specialDep(Account acc) {
-		int specialMoney = 500;
-		NormalAccount normAcc = (NormalAccount) acc;
+		SpecialAccount specAcc = (SpecialAccount) acc;
 		
 		switch (acc.getAccType()) {
-		case 1: 
-			normAcc.setDepositCount(normAcc.getDepositCount() + 1);
-			System.out.println("입금횟수: "+ normAcc.getDepositCount());
-			
-			return specialMoney;
-		case 2:
-			
+		case 1, 2: 
 			return 0;
+		case 3:
+			specAcc.setDepositCnt(specAcc.getDepositCnt() + 1);
+			System.out.println("입금횟수: "+ specAcc.getDepositCnt());
+			return specAcc.getSpecialMoney();
 		default:
 			System.out.println("계좌타입을 알수 없습니다.");
 			return 0;

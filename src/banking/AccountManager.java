@@ -74,7 +74,7 @@ public class AccountManager implements ICustomDefine{
 	        }
 	        //이상없을 시, 계좌 개설
 	        else {
-	        	AccountUtil.createAccount2(scan, accType, accounts);
+	        	AccountUtil.createAccount(scan, accType, accounts);
 	        }
 		} catch (NumberFormatException e) {
 	        System.out.println("숫자를 입력하세요.\n");
@@ -103,12 +103,13 @@ public class AccountManager implements ICustomDefine{
 			//실제 잔액에 반영
 			acc.setBalance(acc.getBalance() + deposit + interest + specialDep);
 			
-			//보통계좌일 경우, 입금 짝수회차마다 축하금 추가출력
-			NormalAccount normAcc = (NormalAccount) acc;
-			if(normAcc.getDepositCount() > 0 && normAcc.getDepositCount()%2 == 0) {
+			//특판계좌일 경우, 입금 짝수회차마다 축하금 추가출력
+			SpecialAccount specAcc = (SpecialAccount) acc;
+			if (acc.accType == 3
+					&& specAcc.getDepositCnt() > 0 && specAcc.getDepositCnt()%2 == 0) {
 				System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원, 축하금: +%d원)%n", 
 						acc.getBalance(), interest, 500);
-			} else {
+			} else { 
 				System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원)%n", acc.getBalance(), interest);
 			}
 		} else {
