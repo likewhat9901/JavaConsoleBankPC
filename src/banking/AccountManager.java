@@ -2,19 +2,20 @@ package banking;
 
 import java.util.Scanner;
 import java.util.Set;
+import java.util.zip.DataFormatException;
 import java.util.HashSet;
 
 import banking.util.AccountUtil;
 
 public class AccountManager implements ICustomDefine{
+	//스캐너 정적 클래스 변수로 선언(클래스 내에서 계속 사용하기 위함).
 	public static Scanner scan = new Scanner(System.in);
-	
 	//HashSet 컬렉션 생성
 	private Set<Account> accounts = new HashSet<Account>();
 	//thread 객체 생성
 	private AutoSaver autoTrd_daemon = new AutoSaver(accounts);
 
-
+	//0.메뉴출력
 	void showMenu() {
 		System.out.println("\n-----Menu------");
 		System.out.println("1.계좌개설");
@@ -34,7 +35,7 @@ public class AccountManager implements ICustomDefine{
 			
 			//메뉴 숫자가 아닌 숫자 입력시 사용자예외처리
 			if(choice < 0 || choice > AUTOSAVE) {
-				throw new MenuSelectException("0~"+ AUTOSAVE + " 사이의 숫자를 입력하세요.");
+				throw new MenuSelectException("0~" + AUTOSAVE + " 사이의 숫자를 입력하세요.");
 			}
 			
 			//메뉴선택에 따른 기능 실행
@@ -50,111 +51,126 @@ public class AccountManager implements ICustomDefine{
 			case EXIT: exitProgram(); break;
 			}	
 		} catch (NumberFormatException e) {
-			System.out.println("문자 또는 잘못된 입력입니다. 숫자를 입력하세요.\n");
+			System.out.println("[숫자가 아닙니다]");
 		} catch (MenuSelectException e) {
-			System.out.println("[예외발생] "+ e.getMessage());
+			System.out.println("[메뉴 예외발생] "+ e.getMessage());
 		}
 	}
 	//1.계좌개설
 	void makeAccount() {
 		try {
-			//계좌종류 선택창 출력
-	        System.out.println("\n***신규계좌개설***");
-	        System.out.println("-----계좌선택------");
+			//계좌타입 확인 시작
+			//계좌타입 선택
+	        System.out.println("\n-----계좌선택------");
 	        System.out.println("1.보통계좌 / 2.신용신뢰계좌");
 	        System.out.print("선택: ");
-	        //계좌종류 선택
 	        int accType = Integer.parseInt(scan.nextLine());
 	        System.out.println("----------------");
 	        
-	        //1,2 이외의 값 입력시 return으로 메뉴복귀
+	        //1,2 이외의 값 입력시 메뉴복귀
 	        if(!(accType == 1  || accType == 2)) {
-				System.out.println("1 또는 2만 입력가능합니다.\n");
+				System.out.println("1 또는 2만 입력가능합니다.");
 	        	return;
 	        }
+	        //(보통계좌 선택 시)특판계좌 가입여부
 	        if(accType == 1) {
 				while (true) {
 					String answer = AccountUtil.inputLine(scan, "특판계좌 상품에 가입하시겠습니까?(y or n): ");
 					switch (answer.toUpperCase()) {
+					//Y 입력시, accType 3으로 변경
 					case "Y":
 						accType = 3;
 						break;
 					case "N":
 						break;
+					//잘못입력시, while문 다시시작
 					default:
-						System.out.println("다시입력하세요.");
-						break;
+						System.out.println("y or n 을 입력하세요.");
+						continue;
 					}
 					break;
 				}
 			}
+	        //계좌타입 확인 끝
 	        
+	        //계좌개설 시작
+	        //계좌개설에 필요한 기본항목들 입력
+	        System.out.println("***신규계좌개설***");
 	        String accNum = AccountUtil.inputLine(scan, "계좌번호: ");
 	        String name = AccountUtil.inputLine(scan, "고객이름: ");
 	        int balance = Integer.parseInt(AccountUtil.inputLine(scan, "잔고: "));
 	        int intRate = Integer.parseInt(AccountUtil.inputLine(scan, "기본이자%(정수형태로입력): "));
 	        
+	        //계좌객체 선언
 	        Account newAcc = null;
 	        
-	      //계좌타입에 따라 계좌생성
+	        //계좌타입에 따라 계좌객체 생성
 	        switch (accType) {
+	        //보통계좌 생성
 			case 1:
-				newAcc = new NormalAccount
-				(accNum, name, balance, intRate);
-//				System.out.println("보통계좌 개설 성공!");
+				newAcc = new NormalAccount(accNum, name, balance, intRate);
 				break;
+			//신용신뢰계좌 생성
 			case 2:
+				//신용등급 확인
 	    		while (true) {
 	    			String CreditGrade = AccountUtil.inputLine(scan, "신용등급(A,B,C등급): ");
 	    			switch (CreditGrade.toUpperCase()) {
 	    			case "A", "B", "C" : 
-	    				newAcc = new HighCreditAccount
-	    				(accNum, name, balance, intRate, CreditGrade);
+	    				newAcc = new HighCreditAccount(accNum, name, balance, intRate, CreditGrade);
 	            		break;
 	    			default:
+	    				//잘못입력시, while문 다시시작
 	    				System.out.println("잘못된 입력입니다. A,B,C 중 하나를 입력하세요");
 	    				continue;
 	    			}
 	    			break;
 	    		}
 	    		break;
+	    	//특판계좌 생성
 			case 3:
 				int DepositCnt = 0;
-				newAcc = new SpecialAccount
-						(accNum, name, balance, intRate, DepositCnt);
+				newAcc = new SpecialAccount(accNum, name, balance, intRate, DepositCnt);
 				break;
 			default:
-	        	System.out.println("뭔가 잘못됐습니다.");
+	        	System.out.println("[계좌생성 예외발생]");
 	        	return;
 			}
 	        
+	        //HashSet에 계좌저장 & 중복계좌 처리
 			while (true) {
+				//이미 if 조건문 안에서 add 실행됨.(1번째 추가시도)
+				//add가 true를 반환했을 경우(정상적으로 추가됨)
 				if (accounts.add(newAcc)) {
 					System.out.println("계좌개설 성공!");
 					return;
-				} else {
+				}
+				//add가 false를 반환했을 경우(추가되지 않음)
+				else {
 					String answer = AccountUtil.inputLine(scan, "중복계좌 발견됨. 덮어쓰시겠습니까?(y or n): ");
-					
+					//덮어쓰기 여부 확인
 					if (answer.equalsIgnoreCase("y")) {
+						//기존계좌 삭제(계좌번호로 확인함)
 						accounts.remove(newAcc);
+						//새 계좌 생성(삭제 후 2번째 추가시도)
 						accounts.add(newAcc);
 						return;
 					} else if (answer.equalsIgnoreCase("n")){
+						//기존 계좌 유지
 						System.out.println("계좌생성 취소");
-						//return으로 메뉴로 복귀
 						return;
 					} else {
+						//while문 다시시작
 						System.out.println("y or n 을 입력하세요.");
-						//continue로 while문 다시 실행
 						continue;
 					}
 				}
 			}
-		} catch (NumberFormatException e) {
-	        System.out.println("숫자를 입력하세요.\n");
-		}//try-catch
-
-	}
+		} //balance, interest를 문자열로 받아 Integer.parseInt 했을때 오류났을 경우
+		catch (NumberFormatException e) {
+	        System.out.println("숫자를 입력하세요.");
+		}//try-catch 끝
+	}//makeAccount 끝
 	
 	//2.입 금
 	void depositMoney() {
@@ -169,9 +185,11 @@ public class AccountManager implements ICustomDefine{
 		if (acc != null) {
 			System.out.println("##계좌를 찾았습니다.##");
 			
-			int money = AccountUtil.depositCheck(scan, acc);
+			//입금조건 확인하고 문제없을경우 d_money 변수에 입금액 저장.
+			int d_money = AccountUtil.depositCheck(scan, acc);
 			
-			acc.deposit(money);
+			//d_money만큼 입금처리 진행
+			acc.deposit(d_money);
 			
 		} else {
 			//acc가 null일 경우
@@ -191,13 +209,13 @@ public class AccountManager implements ICustomDefine{
 		if (acc != null) {
 			System.out.println("##계좌를 찾았습니다.##");
 			
-			//잔액 확인 후, 출금액 이상여부 확인
-			int withdraw = AccountUtil.withdrawCheck(scan, acc);
+			//출금조건 확인하고 문제없을경우 w_money 변수에 출금액 저장.
+			int w_money = AccountUtil.withdrawCheck(scan, acc);
 			
-			//실제 잔액에 반영 후, 잔액 출력
-			acc.setBalance(acc.getBalance() - withdraw);
-			System.out.println("출금이 완료되었습니다. 잔액: " + acc.getBalance());
+			//w_money만큼 출금처리 진행
+			acc.withdraw(w_money);
 		} else {
+			//acc가 null일 경우
 			System.out.println("##찾는 계좌가 없습니다.##");
 		}
 	}

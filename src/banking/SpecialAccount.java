@@ -22,6 +22,12 @@ public class SpecialAccount extends NormalAccount{
 		return accType;
 	}
 	
+	@Override
+	public String getAccClass() {
+		
+		return "특판계좌";
+	}
+	
 	public int getDepositCnt() {
 		return DepositCnt;
 	}
@@ -38,6 +44,8 @@ public class SpecialAccount extends NormalAccount{
 
 	@Override
 	public void showAccInfo() {
+		System.out.println("-------------");
+		System.out.println("계좌종류: "+ getAccClass());
 		super.CallSuperShow();
 		System.out.println("기본이자: "+ super.getInterest() + "%");
 		System.out.println("누적 입금횟수(짝수번째 축하금 지급): "+ DepositCnt + "번 입금완료");
@@ -45,18 +53,24 @@ public class SpecialAccount extends NormalAccount{
 	}
 	
 	@Override
-	public void deposit(int money) {
+	public void deposit(int d_money) {
 		int int_money = (int) (balance*super.getInterest()/100.0);
 		DepositCnt++;
 		
 		if(DepositCnt%2 == 1) {
-			balance = balance + int_money + money;
+			balance = balance + int_money + d_money;
 			System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원)%n", balance, int_money);
 		} else {
-			balance = balance + int_money + money + specialMoney;
+			balance = balance + int_money + d_money + specialMoney;
 			System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원)(축하금: +%d원)%n", 
 					balance, int_money, specialMoney);
 		}
+	}
+	
+	@Override
+	public void withdraw(int w_money) {
+		balance = balance - w_money;
+		System.out.println("출금이 완료되었습니다. 잔액: " + balance);
 	}
 	
 }

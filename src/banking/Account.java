@@ -32,7 +32,6 @@ public abstract class Account implements Serializable{
 	}
 	
 	public int getAccType() {
-		
 		return 0;
 	}
 
@@ -48,11 +47,10 @@ public abstract class Account implements Serializable{
 		this.balance = balance;
 	}
 	
-	public void deposit(int money) {
+	public void deposit(int d_money) {
 	}
 	
-	public int withdraw() {
-		return 0;
+	public void withdraw(int w_money) {
 	}
 	
 	public void createAcc() {
