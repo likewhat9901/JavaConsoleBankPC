@@ -3,25 +3,33 @@ package banking.jdbc.connect;
 import java.sql.*;
 import java.util.Scanner;
 
-public class MyConnection{
+public abstract class MyConnection_JDBC{
 	//멤버상수 : 오라클다라이버, 커넥션URL 선언
-	String ORACLE_DRIVER = "oracle.jdbc.OracleDriver";
-	String ORACLE_URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	//전역상수로 선언 -> 불변, 클래스 전체 공유
+	public static final String ORACLE_DRIVER = "oracle.jdbc.OracleDriver";
+	public static final String ORACLE_URL = "jdbc:oracle:thin:@localhost:1521:xe";
 	
 	//멤버변수
-	public Connection con; //DB연결
-	public ResultSet rs; //select의 실행결과 반환
-	public Statement stmt; //정적 쿼리문 실행
-	public PreparedStatement psmt; //동적 쿼리문 실행
-	public CallableStatement csmt; //프로시저 실행
+	protected Connection con; //DB연결
+	protected ResultSet rs; //select의 실행결과 반환
+	protected Statement stmt; //정적 쿼리문 실행
+	protected PreparedStatement psmt; //동적 쿼리문 실행
+	protected CallableStatement csmt; //프로시저 실행
 	
 	//생성자. 매개변수로 오라클 계정의 아이디, 비번을 전달받음
-	public MyConnection(String user, String pass) {
+	public MyConnection_JDBC(String user, String pass) {
 		try {
 			//오라클 드라이버를 메모리에 로드(인터페이스 상수 사용)
 			Class.forName(ORACLE_DRIVER);
 			//오라클 연결
 			con = DriverManager.getConnection(ORACLE_URL, user, pass);
+			
+			//오라클 연결여부 확인
+			if (con!=null) {
+				System.out.println("Oracle 연결성공");
+			} else {
+				System.out.println("Oracle 연결실패");
+			}
 		} catch (SQLException e) {
 			System.out.println("SQL 예외발생");
 			e.printStackTrace();
@@ -82,5 +90,10 @@ public class MyConnection{
 		}
 		//종료가 아니라면 입력한 값을 반환한다.
 		return inputStr;
+	}
+	
+	
+	public static void main(String[] args) {
+		
 	}
 }

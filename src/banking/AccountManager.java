@@ -7,7 +7,7 @@ import java.util.HashSet;
 import banking.util.AccountUtil;
 
 public class AccountManager implements ICustomDefine{
-	private static Scanner scan = new Scanner(System.in);
+	public static Scanner scan = new Scanner(System.in);
 	
 	//HashSet 컬렉션 생성
 	private Set<Account> accounts = new HashSet<Account>();
@@ -61,25 +61,101 @@ public class AccountManager implements ICustomDefine{
 			//계좌종류 선택창 출력
 	        System.out.println("\n***신규계좌개설***");
 	        System.out.println("-----계좌선택------");
-	        System.out.println("1.보통계좌");
-	        System.out.println("2.신용신뢰계좌");
+	        System.out.println("1.보통계좌 / 2.신용신뢰계좌");
 	        System.out.print("선택: ");
 	        //계좌종류 선택
 	        int accType = Integer.parseInt(scan.nextLine());
 	        System.out.println("----------------");
+	        
 	        //1,2 이외의 값 입력시 return으로 메뉴복귀
-	        if (accType != 1 && accType != 2) {
-	            System.out.println("1 또는 2만 입력가능합니다.\n");
-	            return;  // 실패 시 null 반환
+	        if(!(accType == 1  || accType == 2)) {
+				System.out.println("1 또는 2만 입력가능합니다.\n");
+	        	return;
 	        }
-	        //이상없을 시, 계좌 개설
-	        else {
-	        	AccountUtil.createAccount(scan, accType, accounts);
-	        }
+	        if(accType == 1) {
+				while (true) {
+					String answer = AccountUtil.inputLine(scan, "특판계좌 상품에 가입하시겠습니까?(y or n): ");
+					switch (answer.toUpperCase()) {
+					case "Y":
+						accType = 3;
+						break;
+					case "N":
+						break;
+					default:
+						System.out.println("다시입력하세요.");
+						break;
+					}
+					break;
+				}
+			}
+	        
+	        String accNum = AccountUtil.inputLine(scan, "계좌번호: ");
+	        String name = AccountUtil.inputLine(scan, "고객이름: ");
+	        int balance = Integer.parseInt(AccountUtil.inputLine(scan, "잔고: "));
+	        int intRate = Integer.parseInt(AccountUtil.inputLine(scan, "기본이자%(정수형태로입력): "));
+	        
+	        Account newAcc = null;
+	        
+	      //계좌타입에 따라 계좌생성
+	        switch (accType) {
+			case 1:
+				newAcc = new NormalAccount
+				(accNum, name, balance, intRate);
+//				System.out.println("보통계좌 개설 성공!");
+				break;
+			case 2:
+	    		while (true) {
+	    			String CreditGrade = AccountUtil.inputLine(scan, "신용등급(A,B,C등급): ");
+	    			switch (CreditGrade.toUpperCase()) {
+	    			case "A", "B", "C" : 
+	    				newAcc = new HighCreditAccount
+	    				(accNum, name, balance, intRate, CreditGrade);
+	            		break;
+	    			default:
+	    				System.out.println("잘못된 입력입니다. A,B,C 중 하나를 입력하세요");
+	    				continue;
+	    			}
+	    			break;
+	    		}
+	    		break;
+			case 3:
+				int DepositCnt = 0;
+				newAcc = new SpecialAccount
+						(accNum, name, balance, intRate, DepositCnt);
+				break;
+			default:
+	        	System.out.println("뭔가 잘못됐습니다.");
+	        	return;
+			}
+	        
+			while (true) {
+				if (accounts.add(newAcc)) {
+					System.out.println("계좌개설 성공!");
+					return;
+				} else {
+					String answer = AccountUtil.inputLine(scan, "중복계좌 발견됨. 덮어쓰시겠습니까?(y or n): ");
+					
+					if (answer.equalsIgnoreCase("y")) {
+						accounts.remove(newAcc);
+						accounts.add(newAcc);
+						return;
+					} else if (answer.equalsIgnoreCase("n")){
+						System.out.println("계좌생성 취소");
+						//return으로 메뉴로 복귀
+						return;
+					} else {
+						System.out.println("y or n 을 입력하세요.");
+						//continue로 while문 다시 실행
+						continue;
+					}
+				}
+			}
 		} catch (NumberFormatException e) {
 	        System.out.println("숫자를 입력하세요.\n");
 		}//try-catch
+
 	}
+	
 	//2.입 금
 	void depositMoney() {
 		System.out.println("\n***입 금***\n" + "계좌번호와 입금할 금액을 입력하세요");
@@ -93,25 +169,10 @@ public class AccountManager implements ICustomDefine{
 		if (acc != null) {
 			System.out.println("##계좌를 찾았습니다.##");
 			
-			//잔액 확인 후, 입금액 이상여부 확인
-			int deposit = AccountUtil.depositCheck(scan, acc);
+			int money = AccountUtil.depositCheck(scan, acc);
 			
-			//이자액, 축하금 계산
-			int interest = AccountUtil.calculateInterest(acc);
-			int specialDep = AccountUtil.specialDep(acc);
+			acc.deposit(money);
 			
-			//실제 잔액에 반영
-			acc.setBalance(acc.getBalance() + deposit + interest + specialDep);
-			
-			//특판계좌일 경우, 입금 짝수회차마다 축하금 추가출력
-			SpecialAccount specAcc = (SpecialAccount) acc;
-			if (acc.accType == 3
-					&& specAcc.getDepositCnt() > 0 && specAcc.getDepositCnt()%2 == 0) {
-				System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원, 축하금: +%d원)%n", 
-						acc.getBalance(), interest, 500);
-			} else { 
-				System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원)%n", acc.getBalance(), interest);
-			}
 		} else {
 			//acc가 null일 경우
 			System.out.println("##찾는 계좌가 없습니다.##");

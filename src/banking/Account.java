@@ -6,12 +6,10 @@ import java.util.Objects;
 public abstract class Account implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	protected String accNum;
-	protected String owner;
-	protected int accType ,balance;
+	protected String accNum, owner;
+	protected int balance;
 	
-	public Account(int accType, String accNum, String owner, int balance) {
-		this.accType = accType;
+	public Account(String accNum, String owner, int balance) {
 		this.accNum = accNum;
 		this.owner = owner;
 		this.balance = balance;
@@ -24,28 +22,18 @@ public abstract class Account implements Serializable{
 	}
 	
 	public void showAccInfo() {
-		System.out.println("-------------");
-		System.out.println("계좌종류: "+ accTypeName());
 		System.out.println("계좌번호: "+ accNum);
 		System.out.println("고객이름: "+ owner);
 		System.out.println("잔고: "+ balance + "원");
 	}
 	
-	public String accTypeName() {
-		switch (accType) {
-		case 1:
-			return "보통계좌";
-		case 2: 
-			return "신용신뢰계좌";
-		case 3:
-			return "특판계좌";
-		default:
-			return null;
-		}
+	public String getAccClass() {
+		return null;
 	}
-
+	
 	public int getAccType() {
-		return accType;
+		
+		return 0;
 	}
 
 	public String getAccNum() {
@@ -59,6 +47,19 @@ public abstract class Account implements Serializable{
 	public void setBalance(int balance) {
 		this.balance = balance;
 	}
+	
+	public void deposit(int money) {
+	}
+	
+	public int withdraw() {
+		return 0;
+	}
+	
+	public void createAcc() {
+		
+	}
+	
+	
 
 	@Override
 	public int hashCode() {

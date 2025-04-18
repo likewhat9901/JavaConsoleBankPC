@@ -4,9 +4,9 @@ import java.util.Scanner;
 import java.sql.*;
 
 import banking.MenuSelectException;
-import banking.jdbc.connect.MyConnection;
+import banking.jdbc.connect.MyConnection_JDBC;
 
-public class AccountManager_JDBC extends MyConnection implements ICustomDefine_JDBC{
+public class AccountManager_JDBC extends MyConnection_JDBC implements ICustomDefine_JDBC{
 	private String user;
 	private String pass;
 	

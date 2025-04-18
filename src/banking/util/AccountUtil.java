@@ -41,13 +41,29 @@ public class AccountUtil {
 	}
 	
     //1.계좌개설
-    public static void createAccount(Scanner scan, int accType, Set<Account> accounts) {
+	
+	public static int selectAccType(Scanner scan) {
+		int accType = Integer.parseInt(inputLine(scan, "계좌타입을 알려주세요"));
+		
+		switch (accType) {
+		case 1:
+			return accType;
+		case 2:
+			return 0;
+		case 3:
+			return 0;
+		default:
+			System.out.println("계좌타입을 알수없음.");
+			return 0;
+		}
+	}
+    public static void createAcc(Scanner scan, int accType, Set<Account> accounts) {
         String accNum = inputLine(scan, "계좌번호: ");
-        Account dummy = new NormalAccount(accType, accNum, " ", 0, 0);
+        Account dummy = new NormalAccount(accNum, null, 0, 0);
         
         //중복확인
         while (true) {
-        	if (accounts.contains(dummy)) {
+        	if (accounts.add(dummy)) {
         		String answer = inputLine(scan, "중복계좌 발견됨. 덮어쓰시겠습니까?(y or n): ");
         		
         		if (answer.equalsIgnoreCase("y")) {
@@ -87,13 +103,13 @@ public class AccountUtil {
 					int DepositCnt = 0;
 					accType = 3;
 					newAcc = new SpecialAccount
-							(accType, accNum, name, balance, intRate, DepositCnt);
+							(accNum, name, balance, intRate, DepositCnt);
 					accounts.add(newAcc);
 					System.out.println("특판계좌 개설 성공!");
 					return;
 				case "N" :
 					newAcc = new NormalAccount
-					(accType, accNum, name, balance, intRate);
+					(accNum, name, balance, intRate);
 					accounts.add(newAcc);
 					System.out.println("보통계좌 개설 성공!");
 					return;
@@ -108,7 +124,7 @@ public class AccountUtil {
     			switch (CreditGrade) {
     			case "A", "B", "C" : 
     				newAcc = new HighCreditAccount
-    				(accType, accNum, name, balance, intRate, CreditGrade);
+    				(accNum, name, balance, intRate, CreditGrade);
             		accounts.add(newAcc);
             		return;
     			default:
