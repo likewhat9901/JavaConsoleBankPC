@@ -16,7 +16,6 @@ import banking.HighCreditAccount;
 import banking.NormalAccount;
 import banking.SpecialAccount;
 
-
 public class AccountUtil {
 	
 	private AccountUtil() {
@@ -38,6 +37,119 @@ public class AccountUtil {
 		}
 		
 		return null;
+	}
+	
+	public static int selectAccType(Scanner scan) {
+		System.out.println("\n-----계좌선택------");
+        System.out.println("1.보통계좌 / 2.신용신뢰계좌");
+        System.out.print("선택: ");
+        int accType = Integer.parseInt(scan.nextLine());
+        System.out.println("----------------");
+        
+        //1,2 이외의 값 입력시 메뉴복귀
+        if(!(accType == 1  || accType == 2)) {
+			System.out.println("1 또는 2만 입력가능합니다.");
+			return 0;
+        }
+        //(보통계좌 선택 시)특판계좌 가입여부
+        if(accType == 1) {
+			while (true) {
+				String answer = AccountUtil.inputLine(scan, "특판계좌 상품에 가입하시겠습니까?(y or n): ");
+				switch (answer.toUpperCase()) {
+				//Y 입력시, accType 3으로 변경
+				case "Y":
+					accType = 3;
+					return accType;
+				case "N":
+					break;
+				//잘못입력시, while문 다시시작
+				default:
+					System.out.println("y or n 을 입력하세요.");
+					continue;
+				}
+				break;
+			}
+		}
+        return accType;
+	}
+	
+	public static Account createNewAcc(Scanner scan, int accType) {
+        //2.계좌개설 준비
+        //계좌개설에 필요한 기본항목들 입력
+        System.out.println("***신규계좌개설***");
+        String accNum = AccountUtil.inputLine(scan, "계좌번호: ");
+        String name = AccountUtil.inputLine(scan, "고객이름: ");
+        int balance = Integer.parseInt(AccountUtil.inputLine(scan, "잔고: "));
+        int intRate = Integer.parseInt(AccountUtil.inputLine(scan, "기본이자%(정수형태로입력): "));
+        
+        //계좌객체 선언
+        Account newAcc = null;
+        
+        //계좌타입에 따라 계좌객체 생성
+        switch (accType) {
+        //보통계좌 생성
+		case 1:
+			newAcc = new NormalAccount(accNum, name, balance, intRate);
+			break;
+		//신용신뢰계좌 생성
+		case 2:
+			//신용등급 확인
+    		while (true) {
+    			String CreditGrade = AccountUtil.inputLine(scan, "신용등급(A,B,C등급): ");
+    			switch (CreditGrade.toUpperCase()) {
+    			case "A", "B", "C" : 
+    				newAcc = new HighCreditAccount(accNum, name, balance, intRate, CreditGrade);
+            		break;
+    			default:
+    				//잘못입력시, while문 다시시작
+    				System.out.println("잘못된 입력입니다. A,B,C 중 하나를 입력하세요");
+    				continue;
+    			}
+    			break;
+    		}
+    		break;
+    	//특판계좌 생성
+		case 3:
+			newAcc = new SpecialAccount(accNum, name, balance, intRate);
+			break;
+		default:
+        	System.out.println("[계좌생성 예외발생]");
+        	return null;
+		}
+        
+		return newAcc;
+	}
+	
+	public static void saveNewAcc(Scanner scan, Account newAcc, Set<Account> accounts) {
+        //3.실제계좌 개설 (HashSet에 계좌저장 & 중복계좌 처리)
+        if (accounts.add(newAcc)) {
+        	System.out.println("계좌개설 성공!");
+        	return;
+        }
+        //add가 false를 반환했을 경우(추가되지 않음)
+        else {
+			while (true) {
+				//이미 if 조건문 안에서 add 실행됨.(1번째 추가시도)
+				//add가 true를 반환했을 경우(정상적으로 추가됨)
+				String answer = AccountUtil.inputLine(scan, "중복계좌 발견됨. 덮어쓰시겠습니까?(y or n): ");
+				//덮어쓰기 여부 확인
+				if (answer.equalsIgnoreCase("y")) {
+					//기존계좌 삭제(계좌번호로 확인함)
+					accounts.remove(newAcc);
+					//새 계좌 생성(삭제 후 2번째 추가시도)
+					accounts.add(newAcc);
+					return;
+				} else if (answer.equalsIgnoreCase("n")){
+					//기존 계좌 유지
+					System.out.println("계좌생성 취소");
+					return;
+				} else {
+					//while문 다시시작
+					System.out.println("y or n 을 입력하세요.");
+					continue;
+				}
+			}
+		}
 	}
 	
 	//2.입 금
@@ -103,22 +215,8 @@ public class AccountUtil {
 					return withdraw;
 				}
 			} catch (NumberFormatException e) {
-				System.out.println("문자 또는 잘못된 입력입니다. 숫자를 입력하세요.\n");
+				System.out.println("[withdrawCheck] 숫자를 입력하세요.\n");
 			}
-		}
-	}
-	
-	//5.계좌정보삭제
-	public static void deleteAccount(String searchAcc, Account searchedAcc, Set<Account> accounts) {
-		//삭제 실행
-		accounts.remove(searchedAcc);
-		//삭제 확인
-		Account deleteCheck = findAccount(accounts, searchAcc);
-		//확인 결과
-		if(deleteCheck == null) {
-			System.out.println("삭제 성공!");
-		} else {
-			System.out.println("삭제 실패..");
 		}
 	}
 	

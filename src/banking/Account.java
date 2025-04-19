@@ -43,22 +43,12 @@ public abstract class Account implements Serializable{
 		return balance;
 	}
 	
-	public void setBalance(int balance) {
-		this.balance = balance;
-	}
-	
 	public void deposit(int d_money) {
 	}
 	
 	public void withdraw(int w_money) {
 	}
 	
-	public void createAcc() {
-		
-	}
-	
-	
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(accNum);

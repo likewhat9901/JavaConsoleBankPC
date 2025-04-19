@@ -59,11 +59,11 @@ public abstract class MyConnection_JDBC{
 	public void dbClose() {
 		try {
 			//연결되어 사용중이라면 자원을 반납한다.
-			if(con!=null) con.close();
 			if(rs!=null) rs.close();
 			if(stmt!=null) stmt.close();
 			if(psmt!=null) psmt.close();
 			if(csmt!=null) csmt.close();
+			if(con!=null) con.close();
 			System.out.println("DB 자원 반납");
 		} catch (Exception e) {
 			System.out.println("DB 자원 반납시 예외발생");

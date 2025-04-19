@@ -27,12 +27,7 @@ public class HighCreditAccount extends Account{
 	
 	@Override
 	public String getAccClass() {
-		
 		return "신용신뢰계좌";
-	}
-
-	public int getInterest() {
-		return interest;
 	}
 
 	public int getCreditIntereset() {

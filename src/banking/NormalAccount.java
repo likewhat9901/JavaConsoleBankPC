@@ -1,7 +1,5 @@
 package banking;
 
-import banking.util.AccountUtil;
-
 public class NormalAccount extends Account{
 	private static final long serialVersionUID = 1L;
 	
@@ -19,19 +17,22 @@ public class NormalAccount extends Account{
 		return "[보통계좌] " + super.toString() + ", 기본이자=" + interest + "%" + "]";
 	}
 	
-	public int getInterest() {
-		return interest;
+	public String CallSuperToString() {
+		return super.toString();
 	}
 	
 	@Override
 	public String getAccClass() {
-		
 		return "보통계좌";
 	}
 	
 	@Override
 	public int getAccType() {
 		return accType;
+	}
+	
+	public int getInterest() {
+		return interest;
 	}
 
 	@Override
@@ -58,17 +59,6 @@ public class NormalAccount extends Account{
 	public void withdraw(int w_money) {
 		balance = balance - w_money;
 		System.out.println("출금이 완료되었습니다. 잔액: " + balance);
-	}
-	
-	@Override
-	public void createAcc() {
-        String accNum = AccountUtil.inputLine(AccountManager.scan, "계좌번호: ");
-        String name = AccountUtil.inputLine(AccountManager.scan, "고객이름: ");
-        int balance = Integer.parseInt(AccountUtil.inputLine(AccountManager.scan, "잔고: "));
-        int intRate = Integer.parseInt(AccountUtil.inputLine(AccountManager.scan, "기본이자%(정수형태로입력): "));
-        
-        
-		
 	}
 	
 	

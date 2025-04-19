@@ -90,12 +90,13 @@ public class AccountManager_JDBC extends MyConnection_JDBC implements ICustomDef
 	
 	void depositMoney() {
 		try {
+			con.setAutoCommit(false);
+			
 			System.out.print("계좌번호: ");
 			int acc_num = Integer.parseInt(scan.nextLine().trim());
 			
 			//잔액,이자율 rs로 가져오기
-			String sql_balance = "SELECT balance, interest_rate"
-					+ " FROM banking "
+			String sql_balance = "SELECT balance, interest_rate FROM banking "
 					+ " WHERE acc_id = ?";
 			psmt = con.prepareStatement(sql_balance);
 			psmt.setInt(1, acc_num);
@@ -119,7 +120,7 @@ public class AccountManager_JDBC extends MyConnection_JDBC implements ICustomDef
 			int new_balance = balance + deposit + interest;
 			
 			//잔액 업데이트
-			String sql_update = "UPDATE banking" + " SET balance = ? "
+			String sql_update = "UPDATE banking SET balance = ? "
 					+ " WHERE acc_id = ?";
 			psmt = con.prepareStatement(sql_update);
 			psmt.setInt(1, new_balance);
@@ -129,9 +130,11 @@ public class AccountManager_JDBC extends MyConnection_JDBC implements ICustomDef
 			int updated = psmt.executeUpdate();
 			
 			if(updated > 0) {
+				con.commit();
 				System.out.println("입금완료!");
 				System.out.printf("잔액: %d (이자: %d)%n", new_balance, interest);
 			} else {
+				con.rollback();
 				System.out.println("입금 실패");
 				return;
 			}
@@ -139,11 +142,20 @@ public class AccountManager_JDBC extends MyConnection_JDBC implements ICustomDef
 			System.out.println("[psmt]"+ updated + "행 업데이트 됨");
 			
 		} catch (SQLException e) {
-			System.out.println("SQL 예외 발생" + e.getMessage());
+			try {
+				con.rollback();
+				System.out.println("SQL 예외 발생" + e.getMessage());
+			} catch (SQLException e2) {
+				System.out.println("롤백 예외 발생" + e2.getMessage());
+			}
 		} catch (NumberFormatException e) {
 			System.out.println("숫자가 아닌 형식이 입력되었습니다." + e.getMessage());
 		} finally {
-
+			try {
+				con.setAutoCommit(true);
+			} catch (SQLException e2) {
+				e2.printStackTrace();
+			}
 		}
 	}
 	
