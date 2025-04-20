@@ -39,6 +39,7 @@ public class AccountUtil {
 		return null;
 	}
 	
+	//1.입금
 	public static int selectAccType(Scanner scan) {
 		System.out.println("\n-----계좌선택------");
         System.out.println("1.보통계좌 / 2.신용신뢰계좌");
@@ -122,8 +123,13 @@ public class AccountUtil {
 	
 	public static void saveNewAcc(Scanner scan, Account newAcc, Set<Account> accounts) {
         //3.실제계좌 개설 (HashSet에 계좌저장 & 중복계좌 처리)
-        if (accounts.add(newAcc)) {
+        if (newAcc != null && accounts.add(newAcc)) {
         	System.out.println("계좌개설 성공!");
+        	return;
+        }
+        //newAcc = null 인 경우
+        else if(newAcc == null){
+        	System.out.println("계좌개설 실패..");
         	return;
         }
         //add가 false를 반환했을 경우(추가되지 않음)
