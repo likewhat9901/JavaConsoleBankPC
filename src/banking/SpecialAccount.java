@@ -56,10 +56,4 @@ public class SpecialAccount extends NormalAccount{
 		}
 	}
 	
-	@Override
-	public void withdraw(int w_money) {
-		balance = balance - w_money;
-		System.out.println("출금이 완료되었습니다. 잔액: " + balance);
-	}
-	
 }

@@ -46,7 +46,9 @@ public abstract class Account implements Serializable{
 	public void deposit(int d_money) {
 	}
 	
-	public void withdraw(int w_money) {
+	public void withdraw(int money) {
+		balance = balance - money;
+		System.out.println("출금이 완료되었습니다. 잔액: " + balance);
 	}
 	
 	@Override

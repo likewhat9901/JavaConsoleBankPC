@@ -72,12 +72,6 @@ public class HighCreditAccount extends Account{
 		balance = balance + int_money + d_money;
 		System.out.printf("입금이 완료되었습니다. 잔액: %d원 (이자: +%d원)%n", balance, int_money);
 	}
-	
-	@Override
-	public void withdraw(int w_money) {
-		balance = balance - w_money;
-		System.out.println("출금이 완료되었습니다. 잔액: " + balance);
-	}
 
 	
 
